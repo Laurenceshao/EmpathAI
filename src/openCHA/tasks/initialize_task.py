@@ -3,6 +3,7 @@ from typing import Any
 from openCHA.datapipes import DataPipe
 from openCHA.tasks import BaseTask
 from openCHA.tasks import TASK_TO_CLASS
+from openCHA.tasks import INTERNAL_TASK_TO_CLASS
 
 
 def initialize_task(task: str = "serpapi", **kwargs: Any) -> BaseTask:
@@ -26,12 +27,20 @@ def initialize_task(task: str = "serpapi", **kwargs: Any) -> BaseTask:
 
     """
 
-    if task not in TASK_TO_CLASS:
+    if (
+        task not in TASK_TO_CLASS
+        and task not in INTERNAL_TASK_TO_CLASS
+    ):
         raise ValueError(
             f"Got unknown planner type: {task}. "
             f"Valid types are: {TASK_TO_CLASS.keys()}."
         )
 
-    task_cls = TASK_TO_CLASS[task]
+    task_cls = (
+        TASK_TO_CLASS[task]
+        if task in TASK_TO_CLASS
+        else INTERNAL_TASK_TO_CLASS[task]
+    )
+
     task = task_cls(**kwargs)
     return task

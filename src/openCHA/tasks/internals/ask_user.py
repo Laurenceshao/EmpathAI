@@ -1,7 +1,7 @@
 from typing import Any
 from typing import List
 
-from openCHA.tasks import BaseTask
+from openCHA.tasks.task import BaseTask
 
 
 class AskUser(BaseTask):
@@ -31,6 +31,8 @@ class AskUser(BaseTask):
         """Translate query"""
         if inputs is None:
             return ""
+        
+        print('AskUser task returning: ', inputs[0])
         return inputs[0]
 
     def explain(

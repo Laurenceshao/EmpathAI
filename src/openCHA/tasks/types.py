@@ -1,7 +1,7 @@
 from typing import Dict
 from typing import Type
 
-from openCHA.tasks import AskUser
+#from openCHA.tasks import AskUser
 from openCHA.tasks import BaseTask
 from openCHA.tasks import ExtractText
 from openCHA.tasks import GoogleSearch
@@ -21,7 +21,8 @@ from openCHA.tasks.nutritionix import (
     CalculateFoodRiskFactor,
 )
 from openCHA.tasks.nutritionix import QueryNutritionix
-from openCHA.tasks.suicidal_sensor import SuicidalSensor
+from openCHA.tasks.internals.ask_user import AskUser
+from openCHA.tasks.internals.suicidal_sensor import SuicidalSensor
 
 
 TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
@@ -32,7 +33,7 @@ TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
     TaskType.AFFECT_SLEEP_ANALYSIS: SleepAnalysis,
     TaskType.AFFECT_ACTIVITY_ANALYSIS: ActivityAnalysis,
     TaskType.GOOGLE_TRANSLATE: GoogleTranslate,
-    TaskType.ASK_USER: AskUser,
+    #TaskType.ASK_USER: AskUser,
     TaskType.TEST_FILE: TestFile,
     TaskType.RUN_PYTHON_CODE: RunPythonCode,
     TaskType.PPG_GET: PPGGet,
@@ -41,5 +42,10 @@ TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
     TaskType.QUERY_NUTRITIONIX: QueryNutritionix,
     TaskType.CALCULATE_FOOD_RISK_FACTOR: CalculateFoodRiskFactor,
     TaskType.GOOGLE_SEARCH: GoogleSearch,
+    #TaskType.SUICIDAL_SENSOR: SuicidalSensor
+}
+
+INTERNAL_TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
+    TaskType.ASK_USER: AskUser,
     TaskType.SUICIDAL_SENSOR: SuicidalSensor
 }

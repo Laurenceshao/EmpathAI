@@ -28,6 +28,7 @@ from openCHA.response_generators import (
 from openCHA.tasks import BaseTask
 from openCHA.tasks import initialize_task
 from openCHA.tasks import TaskType
+from openCHA.tasks.types import INTERNAL_TASK_TO_CLASS
 from pydantic import BaseModel
 
 
@@ -140,8 +141,13 @@ class Orchestrator(BaseModel):
                 )
 
         """
+        #add internal tasks 
         if available_tasks is None:
-            available_tasks = []
+            print('ADDING INTERNAL TASKS')
+            available_tasks = INTERNAL_TASK_TO_CLASS.keys()
+        else:
+            available_tasks += INTERNAL_TASK_TO_CLASS.keys()
+
         if previous_actions is None:
             previous_actions = []
 
@@ -316,12 +322,14 @@ class Orchestrator(BaseModel):
         print("runtime", self.runtime)
         final_response = ""
         for action in self.current_actions:
+            print('inside final response loop')
             final_response += action.dict(
                 (
                     action.output_type
                     and not self.runtime[action.task_response]
                 )
             )
+        print('returning: ', final_response)
         return final_response
 
     def response_generator_generate_prompt(
@@ -469,7 +477,7 @@ class Orchestrator(BaseModel):
                 final_response = (
                     self._prepare_planner_response_for_response_generator()
                 )
-                # print("final resp", final_response)
+                print("final resp", final_response)
                 self.current_actions = []
                 self.runtime = {}
                 break

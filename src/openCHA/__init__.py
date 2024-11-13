@@ -1,4 +1,4 @@
-from .openCHA import openCHA
+from openCHA.openCHA import openCHA
 from openCHA.CustomDebugFormatter import CustomDebugFormatter
 from openCHA.utils import (
     get_from_dict_or_env,
