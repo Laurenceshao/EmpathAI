@@ -21,6 +21,7 @@ from openCHA.tasks.nutritionix import (
     CalculateFoodRiskFactor,
 )
 from openCHA.tasks.nutritionix import QueryNutritionix
+from openCHA.tasks.suicidal_sensor import SuicidalSensor
 
 
 TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
@@ -40,4 +41,5 @@ TASK_TO_CLASS: Dict[TaskType, Type[BaseTask]] = {
     TaskType.QUERY_NUTRITIONIX: QueryNutritionix,
     TaskType.CALCULATE_FOOD_RISK_FACTOR: CalculateFoodRiskFactor,
     TaskType.GOOGLE_SEARCH: GoogleSearch,
+    TaskType.SUICIDAL_SENSOR: SuicidalSensor
 }
