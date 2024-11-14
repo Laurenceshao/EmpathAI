@@ -246,13 +246,13 @@ class Orchestrator(BaseModel):
         print('initilizing vector database')
         vector_database = VectorDatabase(embedding_dim=embedding_dim, api_key=openai_api_key)
 
-        print('generating synthetic conversation')
-        # Generate and add synthetic conversations to the vector database
-        synthetic_conversations = self.generate_synthetic_conversations(categories, rows_per_category)
-        for conversation in synthetic_conversations:
-            text = conversation['Person'] + " " + conversation['Therapist']
-            embedding = vector_database.generate_embedding(text)
-            vector_database.add_embeddings(np.array([embedding]), [conversation])
+        # print('generating synthetic conversation')
+        # # Generate and add synthetic conversations to the vector database
+        # synthetic_conversations = self.generate_synthetic_conversations(categories, rows_per_category)
+        # for conversation in synthetic_conversations:
+        #     text = conversation['Person'] + " " + conversation['Therapist']
+        #     embedding = vector_database.generate_embedding(text)
+        #     vector_database.add_embeddings(np.array([embedding]), [conversation])
 
         tasks = {}
         for task in available_tasks:
@@ -533,7 +533,7 @@ class Orchestrator(BaseModel):
             **kwargs,
         )
     
-    def generate_follow_up_questions(self, follow_up_instructions: str, query: str) -> List[str]:
+    def generate_follow_up_questions(self, risk_label: str, query: str) -> List[str]:
         """
         Generate follow-up questions based on risk level instructions using a RAG-based method.
 
@@ -548,38 +548,76 @@ class Orchestrator(BaseModel):
         # Generate an embedding for the query
         #query_embedding = self.embedding_generator.generate(query)
 
-        # Retrieve the top matching conversations from the synthetic data knowledge base
-        retrieved_conversations = self.vector_database.retrieve(query, top_k=3)
 
-        # Extract retrieved therapist responses for context
-        retrieved_context = ""
-        for conversation in retrieved_conversations:
-            retrieved_context += f"Category: {conversation['Category']}\n"
-            retrieved_context += f"Person: {conversation['Person']}\n"
-            retrieved_context += f"Therapist: {conversation['Therapist']}\n\n"
+        #FOR LATER - implement vector database with synthetic data
+        # # Retrieve the top matching conversations from the synthetic data knowledge base
+        # retrieved_conversations = self.vector_database.retrieve(query, top_k=3)
 
-        # Step 2: Define a prompt template for generating follow-up questions
+        # print('retrieved conversations: ', retrieved_conversations)
+
+        # # Extract retrieved therapist responses for context
+        # retrieved_context = ""
+        # for conversation in retrieved_conversations:
+        #     retrieved_context += f"Category: {conversation['Category']}\n"
+        #     retrieved_context += f"Person: {conversation['Person']}\n"
+        #     retrieved_context += f"Therapist: {conversation['Therapist']}\n\n"
+
+        #define context as definition of category and overall instructions for now
+        if risk_label in self.suicide_risk_mapping:
+            risk_methodology = self.suicide_risk_mapping[risk_label]
+        else:
+            risk_methodology = {
+                "instructions": "Provide empathetic support.",
+                "methodology": "General Support",
+                "response_start": "I want to make sure you feel supported.",
+                "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
+            }
+        retrieved_context = risk_methodology
+
+        # Step 2: Define few-shot examples for each category
+        few_shot_examples = (
+            "\n### Examples of Empathetic Conversations ###\n\n"
+            "Category: Supportive\n"
+            "Person: 'I really want to make a change in my life, but I keep doubting myself.'\n"
+            "Therapist: 'Making changes can be challenging, especially when self-doubt creeps in. Maybe we could talk about some small steps that feel manageable?'\n\n"
+            
+            "Category: Indicator\n"
+            "Person: 'Lately, I feel like I’m just tired of everything, like there’s a constant weight I can’t shake off.'\n"
+            "Therapist: 'It sounds like things feel heavy for you right now. I’m here to listen and support you in this journey.'\n\n"
+            
+            "Category: Ideation\n"
+            "Person: 'Sometimes, I wonder if there’s any point to it all.'\n"
+            "Therapist: 'When life feels pointless, it can be deeply isolating. I’m here to help you find some hope. Would you feel comfortable sharing more?'\n\n"
+            
+            "Category: Behavior\n"
+            "Person: 'I’ve been taking risks lately, like driving too fast or going places alone at night.'\n"
+            "Therapist: 'It sounds like these behaviors might be a way of coping with something deeper. Let’s explore how we can work through this together.'\n\n"
+            
+            "Category: Attempt\n"
+            "Person: 'I tried to end things a few weeks ago. I don’t feel any better.'\n"
+            "Therapist: 'I’m so glad you’re here with me now. Talking through these experiences can help, and I’m here to listen and support however I can.'\n"
+        )
+
+        # Step 3: Define prompt template with examples included
         prompt_template = (
-            "You are an empathetic conversational agent tasked with generating appropriate follow-up questions "
-            "for someone expressing a specific level of suicidal risk. Please generate three highly empathetic "
-            "and supportive follow-up questions based on the instructions and context provided below. Ensure that the questions "
-            "encourage dialogue without being intrusive.\n\n"
+            "You are an empathetic conversational agent emulating the role of a therapist, tasked with generating "
+            "appropriate follow-up questions for someone expressing a specific level of suicidal risk. Your role is to provide "
+            "empathetic support and encourage open, safe dialogue. Use the example therapist responses below only as inspiration to "
+            "guide your responses. Do not assume the examples reflect the current user’s situation.\n\n"
             "Instructions: {instructions}\n"
-            "Context from Similar Conversations:\n{context}\n"
+            "Context from Similar Person-Therapist Conversations:\n{context}\n\n"
+            "{examples}\n\n"
+            "Based on these examples, generate three follow-up questions that demonstrate empathy, encourage open dialogue, and provide support.\n"
             "Follow-up questions:"
         )
-        prompt = prompt_template.format(instructions=follow_up_instructions, context=retrieved_context)
 
-        # # Few-shot examples for additional context (optional, can be used to further refine the prompt)
-        # few_shot_examples = (
-        #     "\n### Example 1: Suicidal Ideation (ID)\n"
-        #     "Instructions: The user is expressing suicidal thoughts or ideation. Provide empathetic support and recommend professional help if appropriate.\n"
-        #     "Follow-up questions:\n"
-        #     "1. Could you share more about what you've been experiencing lately that's led you to feel this way?\n"
-        #     "2. What are some things that usually help when you start feeling overwhelmed?\n"
-        #     "3. Have you been able to talk to anyone about these thoughts? If not, would you consider it?\n"
-        # )
-        # prompt += few_shot_examples
+        prompt = prompt_template.format(
+            instructions=retrieved_context['follow_up_instructions'],
+            context=retrieved_context,
+            examples=few_shot_examples
+        )
+
+        #prompt = prompt_template.format(instructions=follow_up_instructions, context=retrieved_context)
 
         # Step 3: Use the follow-up generator for generating follow-up questions
         follow_up_questions = self.follow_up_generator.generate(prompt)
@@ -676,7 +714,7 @@ class Orchestrator(BaseModel):
                 }
 
             # Step 3: Generate follow-up questions based on risk level
-            follow_up_questions = self.generate_follow_up_questions(risk_methodology["follow_up_instructions"], query)
+            follow_up_questions = self.generate_follow_up_questions(risk_label, query)
             print(f"Generated Follow-up Questions: {follow_up_questions}")
 
             # Step 4: Update history with follow-up questions
