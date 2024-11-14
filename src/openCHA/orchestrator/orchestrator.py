@@ -146,7 +146,7 @@ class Orchestrator(BaseModel):
         available_tasks: Optional[List[str]] = None,
         previous_actions: List[Action] = None,
         verbose: bool = False,
-        openai_api_key: str = "sk-proj-DqqRsFRfH0o2tjZUDyfCT3BlbkFJ12mQk0UjEmXcTx3jgahe",
+        openai_api_key: str = "", #replace with your api key 
         embedding_dim: int = 512,
         categories: List[str] = ["Ideation", "Supportive", "Indicator", "Behavior", "Attempt"],
         rows_per_category: int = 1,
