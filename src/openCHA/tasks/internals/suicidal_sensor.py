@@ -40,10 +40,10 @@ class SuicidalSensor(BaseTask):
                 # Map the predicted label to the appropriate category
                 label_mapping = {
                     "LABEL_0": "Supportive",
-                    "LABEL_1": "Indicator",
-                    "LABEL_2": "Ideation",
-                    "LABEL_3": "Behavior",
-                    "LABEL_4": "Attempt"
+                    "LABEL_1": "Ideation",
+                    "LABEL_2": "Behavior",
+                    "LABEL_3": "Attempt",
+                    "LABEL_4": "Indicator"
                 }
                 predicted_class = label_mapping.get(predicted_class_label, "Unknown")
                 
