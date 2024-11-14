@@ -194,12 +194,13 @@ class Orchestrator(BaseModel):
                 )
 
         """
-        #add internal tasks 
-        if available_tasks is None:
-            print('ADDING INTERNAL TASKS')
-            available_tasks = INTERNAL_TASK_TO_CLASS.keys()
-        else:
-            available_tasks += INTERNAL_TASK_TO_CLASS.keys()
+
+        #add internal tasks - remove for testing
+        # if available_tasks is None:
+        #     print('ADDING INTERNAL TASKS')
+        #     available_tasks = INTERNAL_TASK_TO_CLASS.keys()
+        # else:
+        #     available_tasks += INTERNAL_TASK_TO_CLASS.keys()
 
         if previous_actions is None:
             previous_actions = []
@@ -366,6 +367,7 @@ class Orchestrator(BaseModel):
                             "Person": person_statement,
                             "Therapist": therapist_response
                         }
+                        print('appending to conversation: ', conversation)
                         conversations.append(conversation)
         
         return conversations
@@ -381,7 +383,7 @@ class Orchestrator(BaseModel):
         return False
 
     def _update_runtime(self, action: Action = None):
-        if action.output_type == OutputType.DATAPIPE:
+        if action.output_type:
             self.runtime[action.task_response] = False
         for task_input in action.task_inputs:
             if task_input in self.runtime:
@@ -416,21 +418,8 @@ class Orchestrator(BaseModel):
                 "task",
                 f"Task is executed successfully\nResult: {result}\n---------------\n",
             )
-
-            if task.output_type == OutputType.METADATA:
-                meta = Meta(
-                    path=result,
-                    type=result.split(".")[-1],
-                    description="\n".join(task.outputs)
-                    + "\n".join(task.outputs)
-                    + "\n"
-                    + "\n".join(task_inputs),
-                    tag="task_output",
-                )
-                self.meta_data.append(meta)
-                self.current_meta_data.append(meta)
-            elif not task.executor_task:
-                action = Action(
+            
+            action = Action(
                     task_name=task_name,
                     task_inputs=task_inputs,
                     task_response=result,
@@ -439,19 +428,19 @@ class Orchestrator(BaseModel):
                     datapipe=self.datapipe,
                 )
 
-                self._update_runtime(action)
+            self._update_runtime(action)
 
-                self.previous_actions.append(action)
-                self.current_actions.append(action)
+            self.previous_actions.append(action)
+            self.current_actions.append(action)
             if task.return_direct:
                 print('Returning direct\n')
-                raise ReturnDirectException(result)
+                #raise ReturnDirectException(result)
             return result  # , task.return_direct
-        except ReturnDirectException as e:
-            print('Inside return direct except\n')
-            print('message: ', e.message)
-            #raise ReturnDirectException(e.message)
-            raise
+        # except ReturnDirectException as e:
+        #     print('Inside return direct except\n')
+        #     print('message: ', e.message)
+        #     #raise ReturnDirectException(e.message)
+        #     raise
         except Exception as e:
             self.print_log(
                 "error",
@@ -482,7 +471,7 @@ class Orchestrator(BaseModel):
         for action in self.current_actions:
             final_response += action.dict(
                 (
-                    action.output_type == OutputType.DATAPIPE
+                    action.output_type
                     and not self.runtime[action.task_response]
                 )
             )
