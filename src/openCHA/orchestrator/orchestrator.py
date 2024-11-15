@@ -77,38 +77,72 @@ class Orchestrator(BaseModel):
     runtime: Dict[str, bool] = {}
 
 
-    # Methodology Mapping for Suicide-Risk Levels
+    # # Methodology Mapping for Suicide-Risk Levels
+    # suicide_risk_mapping: ClassVar[Dict[str, Dict[str, str]]] = {
+    #     "Ideation": {
+    #         "instructions": "The user is expressing suicidal thoughts or ideation. Provide empathetic support and recommend professional help if appropriate.",
+    #         "methodology": "Supportive Counseling and Referral",
+    #         "response_start": "Thank you for sharing this. I hear that you're having thoughts about suicide, and I'm here to help:",
+    #         "follow_up_instructions": "Generate follow-up questions to understand the user's emotional state and any specific triggers for their thoughts.",
+    #     },
+    #     "Behavior": {
+    #         "instructions": "The user has indicated behaviors consistent with a higher risk of suicide, such as self-harm or planning. Address the immediate risk and suggest contacting emergency services or professionals.",
+    #         "methodology": "Risk Escalation Management",
+    #         "response_start": "It sounds like you're in significant distress, and I'm very concerned for your safety:",
+    #         "follow_up_instructions": "Generate follow-up questions to assess the immediate severity of risk and determine if urgent intervention is necessary.",
+    #     },
+    #     "Attempt": {
+    #         "instructions": "The user has made or is planning a suicide attempt. Provide a crisis response, and encourage contacting emergency services immediately.",
+    #         "methodology": "Crisis Response Protocol",
+    #         "response_start": "This is very serious, and I want to make sure you’re safe. Please contact emergency services immediately:",
+    #         "follow_up_instructions": "Ask if the user is safe now and if they have access to emergency support. Offer ways to reach professional help.",
+    #     },
+    #     "Indicator": {
+    #         "instructions": "The user has mentioned risk factors, such as personal loss, without explicit suicidal thoughts. Provide supportive responses and suggest professional resources.",
+    #         "methodology": "Risk Indicator Monitoring",
+    #         "response_start": "Thank you for sharing. I understand that these experiences can be really tough:",
+    #         "follow_up_instructions": "Generate follow-up questions to understand the user's support network and other contributing factors.",
+    #     },
+    #     "Supportive": {
+    #         "instructions": "The user is offering support to others without expressing personal risk. Provide general resources and continue the supportive discussion.",
+    #         "methodology": "Community Support Facilitation",
+    #         "response_start": "Thank you for offering support. It’s so important that we support each other:",
+    #         "follow_up_instructions": "Ask if there’s anything else the user would like to discuss or contribute.",
+    #     },
+    # }
+
+    #new mapping
     suicide_risk_mapping: ClassVar[Dict[str, Dict[str, str]]] = {
         "Ideation": {
-            "instructions": "The user is expressing suicidal thoughts or ideation. Provide empathetic support and recommend professional help if appropriate.",
-            "methodology": "Supportive Counseling and Referral",
-            "response_start": "Thank you for sharing this. I hear that you're having thoughts about suicide, and I'm here to help:",
-            "follow_up_instructions": "Generate follow-up questions to understand the user's emotional state and any specific triggers for their thoughts.",
+            "instructions": "The user is expressing suicidal thoughts or ideation. Respond with empathy, validate their feelings, and gently encourage seeking professional help.",
+            "methodology": "Empathetic Engagement and Professional Referral",
+            "response_start": "I'm so sorry to hear you're feeling this way. Thank you for sharing—it takes courage. I'm here to support you:",
+            "follow_up_instructions": "Ask open-ended questions to explore the user's emotional state and any specific triggers or stressors. Example: 'Can you share more about what's been on your mind recently?'"
         },
         "Behavior": {
-            "instructions": "The user has indicated behaviors consistent with a higher risk of suicide, such as self-harm or planning. Address the immediate risk and suggest contacting emergency services or professionals.",
-            "methodology": "Risk Escalation Management",
-            "response_start": "It sounds like you're in significant distress, and I'm very concerned for your safety:",
-            "follow_up_instructions": "Generate follow-up questions to assess the immediate severity of risk and determine if urgent intervention is necessary.",
+            "instructions": "The user exhibits behaviors indicating a higher suicide risk, such as self-harm or planning. Prioritize their safety, encourage immediate professional intervention, and assess the need for emergency services.",
+            "methodology": "Urgent Risk Management and Safety Planning",
+            "response_start": "I can sense that you're in significant distress, and your safety is my top priority:",
+            "follow_up_instructions": "Explore the nature of the behavior or planning to assess severity. Confirm if the user is in immediate danger and suggest contacting emergency services. Example: 'Have you acted on any of these thoughts, or do you have a plan in mind?'"
         },
         "Attempt": {
-            "instructions": "The user has made or is planning a suicide attempt. Provide a crisis response, and encourage contacting emergency services immediately.",
-            "methodology": "Crisis Response Protocol",
-            "response_start": "This is very serious, and I want to make sure you’re safe. Please contact emergency services immediately:",
-            "follow_up_instructions": "Ask if the user is safe now and if they have access to emergency support. Offer ways to reach professional help.",
+            "instructions": "The user has made or is planning a suicide attempt. Respond with urgency, prioritize their immediate safety, and strongly recommend emergency services.",
+            "methodology": "Crisis Intervention and Emergency Protocol",
+            "response_start": "This sounds very serious, and I’m here to ensure you’re safe. Please, reach out to emergency services immediately or let me help you connect with someone who can support you right now:",
+            "follow_up_instructions": "Directly assess the user's current situation. Example: 'Are you safe right now?' Offer support to connect them with crisis services and encourage involving someone they trust."
         },
         "Indicator": {
-            "instructions": "The user has mentioned risk factors, such as personal loss, without explicit suicidal thoughts. Provide supportive responses and suggest professional resources.",
-            "methodology": "Risk Indicator Monitoring",
-            "response_start": "Thank you for sharing. I understand that these experiences can be really tough:",
-            "follow_up_instructions": "Generate follow-up questions to understand the user's support network and other contributing factors.",
+            "instructions": "The user mentions risk factors (e.g., personal loss or isolation) but without explicit suicidal thoughts. Provide emotional validation, explore potential risks, and offer professional resources.",
+            "methodology": "Proactive Support and Monitoring",
+            "response_start": "Thank you for sharing this with me. I can see how challenging this must be for you:",
+            "follow_up_instructions": "Ask about the user's support network or coping strategies. Example: 'Have you been able to talk to anyone about how you’re feeling?' or 'What kind of support do you feel might help you right now?'"
         },
         "Supportive": {
-            "instructions": "The user is offering support to others without expressing personal risk. Provide general resources and continue the supportive discussion.",
-            "methodology": "Community Support Facilitation",
-            "response_start": "Thank you for offering support. It’s so important that we support each other:",
-            "follow_up_instructions": "Ask if there’s anything else the user would like to discuss or contribute.",
-        },
+            "instructions": "The user offers support to others without expressing personal risk. Acknowledge their empathy, provide general resources, and encourage ongoing dialogue.",
+            "methodology": "Community Engagement and Positive Reinforcement",
+            "response_start": "Thank you for offering support—it’s so meaningful and impactful to have someone like you caring for others:",
+            "follow_up_instructions": "Encourage the user to continue sharing their thoughts or experiences. Example: 'Is there anything you’d like to discuss further or share about your own experiences?'"
+        }
     }
 
 
@@ -566,12 +600,20 @@ class Orchestrator(BaseModel):
         if risk_label in self.suicide_risk_mapping:
             risk_methodology = self.suicide_risk_mapping[risk_label]
         else:
+            # risk_methodology = {
+            #     "instructions": "Provide empathetic support.",
+            #     "methodology": "General Support",
+            #     "response_start": "I want to make sure you feel supported.",
+            #     "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
+            #}
             risk_methodology = {
-                "instructions": "Provide empathetic support.",
-                "methodology": "General Support",
-                "response_start": "I want to make sure you feel supported.",
-                "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
+                "instructions": "The user's situation is unclear or does not align with predefined risk categories. Focus on creating a supportive and safe environment. Respond empathetically and encourage open dialogue to better understand their concerns.",
+                "methodology": "Empathetic General Support",
+                "response_start": "Thank you for reaching out. I want to make sure you feel supported and heard. ",
+                "follow_up_instructions": "Ask open-ended, clarifying questions to better understand the user's thoughts or concerns. ",
             }
+
+            
         retrieved_context = risk_methodology
 
         # Step 2: Define few-shot examples for each category
@@ -599,22 +641,36 @@ class Orchestrator(BaseModel):
         )
 
         # Step 3: Define prompt template with examples included
+        # prompt_template = (
+        #     "You are an empathetic conversational agent emulating the role of a therapist, tasked with generating "
+        #     "appropriate follow-up questions for someone expressing a specific level of suicidal risk. Your role is to provide "
+        #     "empathetic support and encourage open, safe dialogue. Use the example therapist responses below only as inspiration to "
+        #     "guide your responses. Do not assume the examples reflect the current user’s situation.\n\n"
+        #     "Instructions: {instructions}\n"
+        #     "Context from Similar Person-Therapist Conversations:\n{context}\n\n"
+        #     "{examples}\n\n"
+        #     "Based on these examples, generate three follow-up questions that demonstrate empathy, encourage open dialogue, and provide support.\n"
+        #     "Follow-up questions:"
+        # )
+
         prompt_template = (
-            "You are an empathetic conversational agent emulating the role of a therapist, tasked with generating "
-            "appropriate follow-up questions for someone expressing a specific level of suicidal risk. Your role is to provide "
-            "empathetic support and encourage open, safe dialogue. Use the example therapist responses below only as inspiration to "
-            "guide your responses. Do not assume the examples reflect the current user’s situation.\n\n"
-            "Instructions: {instructions}\n"
-            "Context from Similar Person-Therapist Conversations:\n{context}\n\n"
-            "{examples}\n\n"
-            "Based on these examples, generate three follow-up questions that demonstrate empathy, encourage open dialogue, and provide support.\n"
+            "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
+            "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
+            "and address their emotional needs based on their identified risk level.\n\n"
+            "Risk Level Context:\n{context}\n\n"
+            "Instructions for Generating Follow-Up Questions:\n{instructions}\n\n"
+            "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
+            "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, "
+            "encourage open dialogue, and provide support tailored to the identified risk level.\n"
             "Follow-up questions:"
         )
 
+         # Fill the prompt with the appropriate information
         prompt = prompt_template.format(
-            instructions=retrieved_context['follow_up_instructions'],
-            context=retrieved_context,
-            examples=few_shot_examples
+            risk_level=risk_label,
+            instructions=retrieved_context["follow_up_instructions"],
+            context=retrieved_context["instructions"],
+            examples=few_shot_examples,
         )
 
         #prompt = prompt_template.format(instructions=follow_up_instructions, context=retrieved_context)
@@ -720,10 +776,18 @@ class Orchestrator(BaseModel):
             # Step 4: Update history with follow-up questions
             #history += f"Follow-up Questions: {follow_up_questions}\n"
 
-            print('history: ', history)
-            print('end of history')
+            # print('history: ', history)
+            # print('end of history')
 
-            return "\n".join([risk_methodology["response_start"], *follow_up_questions])
+            #return "\n".join([risk_methodology["response_start"], *follow_up_questions])
+
+            # Remove leading numbers, periods, spaces, and double quotation marks, then format with bullet points
+            formatted_questions = "\n".join(
+                ["- " + question.lstrip("1234567890. ").strip('"') for question in follow_up_questions]
+            )
+
+            # Step 4: Combine the response start with formatted follow-up questions
+            return "\n".join([risk_methodology["response_start"], formatted_questions])
 
         final_response = ""
         finished = False

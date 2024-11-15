@@ -115,6 +115,8 @@ If the tool input is a datapipe only put the variable as the input. \
 For each tool, include necessary parameters directly without any names and assume each will return an output. \
 The outputs' description are provided for each Tool individually. Make sure you use the directives when passing the outputs.
 
+Ensure that all information is obtained through the available tools, and do not attempt to gather additional information through user input. Stick strictly to utilizing the tools provided, and avoid using any functions like input() to request further details from the user.
+
 Question: {input}
 """,
         ]
