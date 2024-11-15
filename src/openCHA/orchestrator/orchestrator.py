@@ -660,7 +660,7 @@ class Orchestrator(BaseModel):
             "Risk Level Context:\n{context}\n\n"
             "Instructions for Generating Follow-Up Questions:\n{instructions}\n\n"
             "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
-            "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, "
+            "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, focus on different aspects, and validate the user's mental state, "
             "encourage open dialogue, and provide support tailored to the identified risk level.\n"
             "Follow-up questions:"
         )
