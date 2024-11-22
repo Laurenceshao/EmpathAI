@@ -5,9 +5,12 @@ from openCHA.planners import BasePlanner
 from openCHA.planners import PlannerType
 from openCHA.planners import TreeOfThoughtPlanner
 from openCHA.planners.react import ReActPlanner
+from openCHA.planners import EmpatheticTreeOfThoughtPlanner
 
 
 PLANNER_TO_CLASS: Dict[PlannerType, Type[BasePlanner]] = {
     PlannerType.ZERO_SHOT_REACT_PLANNER: ReActPlanner,
     PlannerType.TREE_OF_THOUGHT: TreeOfThoughtPlanner,
+    PlannerType.EMPATHETIC_TREE_OF_THOUGHT: EmpatheticTreeOfThoughtPlanner
+    
 }

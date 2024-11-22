@@ -75,7 +75,8 @@ class BaseFollowUpGenerator(BaseModel):
         Return:
             List[str]: A list of generated follow-up questions.
         """
-        prompt = self._generator_prompt.replace("{instructions}", instructions)
+        #prompt = self._generator_prompt.replace("{instructions}", instructions)
+        prompt = instructions 
         print('follow-up generator prompt: ', prompt)
         response = self._follow_up_generator_model.generate(
             query=prompt,

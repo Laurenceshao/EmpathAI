@@ -22,7 +22,8 @@ class openCHA(BaseModel):
     previous_actions: List[Action] = []
     orchestrator: Orchestrator = None
     planner_llm: str = LLMType.OPENAI
-    planner: str = PlannerType.TREE_OF_THOUGHT
+    #planner: str = PlannerType.TREE_OF_THOUGHT
+    planner: str = PlannerType.EMPATHETIC_TREE_OF_THOUGHT
     datapipe: str = DatapipeType.MEMORY
     promptist: str = ""
     response_generator_llm: str = LLMType.OPENAI

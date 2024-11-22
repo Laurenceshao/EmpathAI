@@ -600,12 +600,6 @@ class Orchestrator(BaseModel):
         if risk_label in self.suicide_risk_mapping:
             risk_methodology = self.suicide_risk_mapping[risk_label]
         else:
-            # risk_methodology = {
-            #     "instructions": "Provide empathetic support.",
-            #     "methodology": "General Support",
-            #     "response_start": "I want to make sure you feel supported.",
-            #     "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
-            #}
             risk_methodology = {
                 "instructions": "The user's situation is unclear or does not align with predefined risk categories. Focus on creating a supportive and safe environment. Respond empathetically and encourage open dialogue to better understand their concerns.",
                 "methodology": "Empathetic General Support",
@@ -640,16 +634,15 @@ class Orchestrator(BaseModel):
             "Therapist: 'I’m so glad you’re here with me now. Talking through these experiences can help, and I’m here to listen and support however I can.'\n"
         )
 
-        # Step 3: Define prompt template with examples included
         # prompt_template = (
-        #     "You are an empathetic conversational agent emulating the role of a therapist, tasked with generating "
-        #     "appropriate follow-up questions for someone expressing a specific level of suicidal risk. Your role is to provide "
-        #     "empathetic support and encourage open, safe dialogue. Use the example therapist responses below only as inspiration to "
-        #     "guide your responses. Do not assume the examples reflect the current user’s situation.\n\n"
-        #     "Instructions: {instructions}\n"
-        #     "Context from Similar Person-Therapist Conversations:\n{context}\n\n"
-        #     "{examples}\n\n"
-        #     "Based on these examples, generate three follow-up questions that demonstrate empathy, encourage open dialogue, and provide support.\n"
+        #     "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
+        #     "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
+        #     "and address their emotional needs based on their identified risk level.\n\n"
+        #     "Risk Level Context:\n{context}\n\n"
+        #     "Instructions for Generating Follow-Up Questions:\n{instructions}\n\n"
+        #     "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
+        #     "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, focus on different aspects, and validate the user's mental state, "
+        #     "encourage open dialogue, and provide support tailored to the identified risk level.\n"
         #     "Follow-up questions:"
         # )
 
@@ -658,12 +651,33 @@ class Orchestrator(BaseModel):
             "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
             "and address their emotional needs based on their identified risk level.\n\n"
             "Risk Level Context:\n{context}\n\n"
-            "Instructions for Generating Follow-Up Questions:\n{instructions}\n\n"
+            "Instructions for Generating Follow-Up Questions:\n"
+            "- Use the user's query to guide the focus of the questions. Dynamically determine the number of follow-up questions needed based on the information gaps in the user's query."
+            "- Identify key aspects of the user's mental state that require clarification to better understand their emotional and psychological needs. Each question should address a distinct aspect of the user's mental state or situation, such as triggers, emotional impact, coping mechanisms, or support needs.\n"
+            "- Each question should demonstrate empathy, focus on a unique aspect, and encourage open dialogue while validating the user's emotions.\n"
+            "- The examples below provide guidance on tone and style but should not dictate the content of your questions.\n\n"
             "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
-            "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, focus on different aspects, and validate the user's mental state, "
-            "encourage open dialogue, and provide support tailored to the identified risk level.\n"
+            "User Query:\n{user_query}\n\n"
+            "Using the context, instructions, and examples above, generate at least three (more if needed) highly empathetic and supportive follow-up questions that align with the user's input, explore different aspects of their mental state, and encourage open dialogue without being intrusive. Ensure that you always validate the user's feelings and provide emotional reassurance.\n\n"
             "Follow-up questions:"
         )
+
+        # prompt_template = (
+        #     "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
+        #     "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
+        #     "and address their emotional needs based on their identified risk level.\n\n"
+        #     "Risk Level Context:\n{context}\n\n"
+        #     "Instructions for Generating Follow-Up Questions:\n"
+        #     "- Dynamically determine the number of follow-up questions needed based on the information gaps in the user's query.\n"
+        #     "- Identify key aspects of the user's mental state that require clarification to better understand their emotional and psychological needs.\n"
+        #     "- Each question should demonstrate empathy, focus on a unique aspect, and encourage open dialogue while validating the user's emotions.\n\n"
+        #     "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
+        #     "Using the context, instructions, and examples above, analyze the user's input and generate an appropriate number of follow-up questions. "
+        #     "These questions should aim to clarify the user's mental state, validate their feelings, and address emotional needs specific to the identified risk level. "
+        #     "Ensure the questions are open-ended and tailored to encourage further discussion.\n\n"
+        #     "User Input:\n{user_input}\n\n"
+        #     "Follow-up questions:"
+        # )
 
          # Fill the prompt with the appropriate information
         prompt = prompt_template.format(
@@ -671,6 +685,7 @@ class Orchestrator(BaseModel):
             instructions=retrieved_context["follow_up_instructions"],
             context=retrieved_context["instructions"],
             examples=few_shot_examples,
+            user_query=query,
         )
 
         #prompt = prompt_template.format(instructions=follow_up_instructions, context=retrieved_context)
@@ -706,6 +721,16 @@ class Orchestrator(BaseModel):
                 logging.exception(e)
                 retries += 1
         return "We currently have problem processing your question. Please try again after a while."
+    
+    def process_plan_result(self, plan_result):
+        if not plan_result:
+            return "No resources could be retrieved."
+        elif isinstance(plan_result, list):
+            # Combine the extracted texts into a single string or process as needed
+            combined_result = "\n\n".join(plan_result)
+            return combined_result
+        else:
+            return str(plan_result)
 
     def run(
         self,
@@ -754,10 +779,32 @@ class Orchestrator(BaseModel):
 
         if "CHA" not in history:
             # Step 1: Use SuicidalSensor to assess risk level
-            risk_assessment_result = self.suicidal_sensor.execute([query])
-            print(f"Risk Assessment Result: {risk_assessment_result}")
+            # risk_assessment_result = self.suicidal_sensor.execute([query])
+            # print(f"Risk Assessment Result: {risk_assessment_result}")
 
-            # Step 2: Determine methodology based on risk level
+            # # Step 2: Determine methodology based on risk level
+            # risk_label = risk_assessment_result.split(",")[0].split(":")[1].strip()
+            # if risk_label in self.suicide_risk_mapping:
+            #     risk_methodology = self.suicide_risk_mapping[risk_label]
+            # else:
+            #     risk_methodology = {
+            #         "instructions": "Provide empathetic support.",
+            #         "methodology": "General Support",
+            #         "response_start": "I want to make sure you feel supported.",
+            #         "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
+            #     }
+
+            #forced class for now
+            risk_assessment_result = (
+                "Predicted class: Behavior, Score: 0.85162264108657837, Context: The user exhibits "
+                "behaviors indicating a higher suicide risk, such as self-harm or planning. Prioritize "
+                "their safety, encourage immediate professional intervention, and assess the need for "
+                "emergency services., Risk Relationship: "
+                '"The current label is Behavior, meaning the user is exhibiting actions or planning that '
+                'suggest a high risk of suicide, such as self-harm or explicit planning. This is a higher '
+                "level of risk compared to 'Supportive', 'Indicator', and 'Ideation'. Immediate intervention "
+                'is often required to prevent escalation to an actual attempt."'
+            )
             risk_label = risk_assessment_result.split(",")[0].split(":")[1].strip()
             if risk_label in self.suicide_risk_mapping:
                 risk_methodology = self.suicide_risk_mapping[risk_label]
@@ -768,6 +815,7 @@ class Orchestrator(BaseModel):
                     "response_start": "I want to make sure you feel supported.",
                     "follow_up_instructions": "Ask clarifying questions to understand the user's concerns better.",
                 }
+
 
             # Step 3: Generate follow-up questions based on risk level
             follow_up_questions = self.generate_follow_up_questions(risk_label, query)
@@ -804,12 +852,21 @@ class Orchestrator(BaseModel):
                     meta=meta_infos,
                     use_history=use_history,
                     **kwargs,
-                )
+                ) 
+                # vars = {}
+                # exec(actions, locals(), vars)
+                # final_response = (
+                #     self._prepare_planner_response_for_response_generator()
+                # )
                 vars = {}
                 exec(actions, locals(), vars)
-                final_response = (
-                    self._prepare_planner_response_for_response_generator()
-                )
+                # After executing, call execute_plan and get the result
+                if 'execute_plan' in vars:
+                    plan_result = vars['execute_plan']()
+                    final_response = self.process_plan_result(plan_result)
+                else:
+                    raise ValueError("No 'execute_plan' function defined in actions.")
+
                 print("final resp", final_response)
                 self.current_actions = []
                 self.runtime = {}
