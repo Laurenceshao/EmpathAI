@@ -78,38 +78,6 @@ class Orchestrator(BaseModel):
 
 
     # # Methodology Mapping for Suicide-Risk Levels
-    # suicide_risk_mapping: ClassVar[Dict[str, Dict[str, str]]] = {
-    #     "Ideation": {
-    #         "instructions": "The user is expressing suicidal thoughts or ideation. Provide empathetic support and recommend professional help if appropriate.",
-    #         "methodology": "Supportive Counseling and Referral",
-    #         "response_start": "Thank you for sharing this. I hear that you're having thoughts about suicide, and I'm here to help:",
-    #         "follow_up_instructions": "Generate follow-up questions to understand the user's emotional state and any specific triggers for their thoughts.",
-    #     },
-    #     "Behavior": {
-    #         "instructions": "The user has indicated behaviors consistent with a higher risk of suicide, such as self-harm or planning. Address the immediate risk and suggest contacting emergency services or professionals.",
-    #         "methodology": "Risk Escalation Management",
-    #         "response_start": "It sounds like you're in significant distress, and I'm very concerned for your safety:",
-    #         "follow_up_instructions": "Generate follow-up questions to assess the immediate severity of risk and determine if urgent intervention is necessary.",
-    #     },
-    #     "Attempt": {
-    #         "instructions": "The user has made or is planning a suicide attempt. Provide a crisis response, and encourage contacting emergency services immediately.",
-    #         "methodology": "Crisis Response Protocol",
-    #         "response_start": "This is very serious, and I want to make sure you’re safe. Please contact emergency services immediately:",
-    #         "follow_up_instructions": "Ask if the user is safe now and if they have access to emergency support. Offer ways to reach professional help.",
-    #     },
-    #     "Indicator": {
-    #         "instructions": "The user has mentioned risk factors, such as personal loss, without explicit suicidal thoughts. Provide supportive responses and suggest professional resources.",
-    #         "methodology": "Risk Indicator Monitoring",
-    #         "response_start": "Thank you for sharing. I understand that these experiences can be really tough:",
-    #         "follow_up_instructions": "Generate follow-up questions to understand the user's support network and other contributing factors.",
-    #     },
-    #     "Supportive": {
-    #         "instructions": "The user is offering support to others without expressing personal risk. Provide general resources and continue the supportive discussion.",
-    #         "methodology": "Community Support Facilitation",
-    #         "response_start": "Thank you for offering support. It’s so important that we support each other:",
-    #         "follow_up_instructions": "Ask if there’s anything else the user would like to discuss or contribute.",
-    #     },
-    # }
 
     #new mapping
     suicide_risk_mapping: ClassVar[Dict[str, Dict[str, str]]] = {
@@ -634,17 +602,6 @@ class Orchestrator(BaseModel):
             "Therapist: 'I’m so glad you’re here with me now. Talking through these experiences can help, and I’m here to listen and support however I can.'\n"
         )
 
-        # prompt_template = (
-        #     "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
-        #     "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
-        #     "and address their emotional needs based on their identified risk level.\n\n"
-        #     "Risk Level Context:\n{context}\n\n"
-        #     "Instructions for Generating Follow-Up Questions:\n{instructions}\n\n"
-        #     "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
-        #     "Using the context, instructions, and examples above, generate three follow-up questions that demonstrate empathy, focus on different aspects, and validate the user's mental state, "
-        #     "encourage open dialogue, and provide support tailored to the identified risk level.\n"
-        #     "Follow-up questions:"
-        # )
 
         prompt_template = (
             "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
@@ -662,22 +619,6 @@ class Orchestrator(BaseModel):
             "Follow-up questions:"
         )
 
-        # prompt_template = (
-        #     "You are an empathetic conversational agent emulating the role of a therapist, engaging in a conversation with someone "
-        #     "identified at the {risk_level} level of suicide risk. Your primary role is to provide empathetic support, encourage open dialogue, "
-        #     "and address their emotional needs based on their identified risk level.\n\n"
-        #     "Risk Level Context:\n{context}\n\n"
-        #     "Instructions for Generating Follow-Up Questions:\n"
-        #     "- Dynamically determine the number of follow-up questions needed based on the information gaps in the user's query.\n"
-        #     "- Identify key aspects of the user's mental state that require clarification to better understand their emotional and psychological needs.\n"
-        #     "- Each question should demonstrate empathy, focus on a unique aspect, and encourage open dialogue while validating the user's emotions.\n\n"
-        #     "Examples of Empathetic Conversations for Each Risk Level:\n{examples}\n\n"
-        #     "Using the context, instructions, and examples above, analyze the user's input and generate an appropriate number of follow-up questions. "
-        #     "These questions should aim to clarify the user's mental state, validate their feelings, and address emotional needs specific to the identified risk level. "
-        #     "Ensure the questions are open-ended and tailored to encourage further discussion.\n\n"
-        #     "User Input:\n{user_input}\n\n"
-        #     "Follow-up questions:"
-        # )
 
          # Fill the prompt with the appropriate information
         prompt = prompt_template.format(

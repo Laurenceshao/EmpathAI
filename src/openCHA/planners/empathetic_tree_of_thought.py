@@ -93,43 +93,7 @@ class EmpatheticTreeOfThoughtPlanner(BasePlanner):
     @property
     def _planner_prompt(self):
             return [
-    #         """You are a knowledgeable and empathetic health assistant, tasked with providing tailored support based on a user's identified suicide risk level. 
-    # Their risk level has been assessed as: {risk_label}. Use this context to guide your planning.
 
-    # Risk Level Instructions:
-    # {instructions}
-
-    # Methodology Context:
-    # {methodology}
-
-    # Here are the tools available for planning:
-    # {tool_names}
-
-    # The following is the format of the information provided:
-    # MetaData: Contains names of data files (e.g., text, audio). Use these files with the tools as needed.
-    # History: Contains previous conversations. Use this for continuity in dialogue.
-    # PreviousActions: Details of actions already performed.
-
-    # USER QUERY: {input}
-
-    # Develop three strategies to address the user’s query. Each strategy should:
-    # 1. Respect the user's emotional state and prioritize safety.
-    # 2. Use available tools effectively to gather necessary context.
-    # 3. Propose empathetic follow-up steps.
-
-    # Explain the pros and cons of each strategy, then select the best one for implementation.
-
-    # Start the final decision with:
-    # 'Decision:'.
-
-    # MetaData:
-    # {meta}
-    # =========================
-    # {previous_actions}
-    # =========================
-    # {history}
-    # =========================
-    # USER QUERY: {input}\n"""
     """You are a knowledgeable and empathetic health assistant, tasked with providing tailored support based on a user's identified suicide risk level.
     Their risk level has been assessed as: {risk_label}. Use this context to guide your planning.
 
@@ -168,40 +132,7 @@ class EmpatheticTreeOfThoughtPlanner(BasePlanner):
     =========================
     USER QUERY: {input}\n"""
     ,
-    # """{strategy}
-    #     =========================
-    #     {previous_actions}
-    #     =========================
-    #     Tools:
-    #     {tool_names}
-    #     =========================
-
-    #     You are a skilled Python programmer. Using the selected final strategy mentioned in 'Decision:', write Python code that:
-
-    #     1. Uses the `serpapi` tool to search for relevant resources.
-    #     - Example: `search_result = self.execute_task('serpapi', ['query'])`
-    #     - Validate that the result contains a key `'url'`. If not, handle it gracefully.
-
-    #     2. Uses the `extract_text` tool to extract content from the retrieved URL.
-    #     - Example: `extracted_text = self.execute_task('extract_text', [url])`
-    #     - Validate that the result is not empty or invalid. If the result indicates an error, stop execution and log the issue.
-
-    #     3. Chains these tasks together, ensuring that the output of `serpapi` is used as the input to `extract_text`.
-
-    #     Include explicit validation steps for tool outputs and handle errors gracefully. Ensure the generated code uses this structure:
-    #     ```python
-    #     search_result = self.execute_task('serpapi', ['query'])
-    #     if 'error' in search_result or 'url' not in search_result:
-    #         raise ValueError(f"Search failed: {search_result.get('error', 'No URL found')}")
-
-    #     extracted_text = self.execute_task('extract_text', [search_result['url']])
-    #     if 'error' in extracted_text:
-    #         raise ValueError(f"Text extraction failed: {extracted_text['error']}")
-    #     ```
-
-    #     Write the complete code inside a Python code block.
-    #     """
-
+ 
     """Decision:
     {strategy}
     =========================
@@ -242,47 +173,6 @@ class EmpatheticTreeOfThoughtPlanner(BasePlanner):
 
         Write the complete code inside a Python code block.
         """
-    # """{strategy}
-    #     =========================
-    #     {previous_actions}
-    #     =========================
-    #     Tools:
-    #     {tool_names}
-    #     =========================
-
-    #     You are a skilled Python programmer. Using the selected final strategy mentioned in 'Decision:', write Python code that:
-
-    #     1. Defines a function `def execute_plan():` to encapsulate the logic.
-    #     2. Uses the `quantity_factor` variable to determine how many resources to fetch.
-    #        - For example, use a loop to make `quantity_factor` calls to `serpapi` or adjust the search to retrieve multiple results at once.
-    #     3. Uses the `serpapi` tool to search for relevant resources.
-    #        - Example: `search_result = self.execute_task('serpapi', ['query'])`
-    #        - Validate that each result contains a key `'url'`. If not, handle it gracefully.
-    #     4. Uses the `extract_text` tool to extract content from each retrieved URL.
-    #        - Example: `extracted_text = self.execute_task('extract_text', [url])`
-    #        - Validate that the result is not empty or invalid. If the result indicates an error, handle it appropriately.
-    #     5. Chains these tasks together, ensuring that the outputs of `serpapi` are used as inputs to `extract_text`.
-    #     6. Aggregates the results from all successful extractions.
-
-    #     Include explicit validation steps for tool outputs and handle errors gracefully. Ensure the generated code uses this structure:
-
-    #     ```python
-    #     def execute_plan():
-    #         results = []
-    #         for i in range(quantity_factor):
-    #             search_result = self.execute_task('serpapi', ['query'])
-    #             if 'error' in search_result or 'url' not in search_result:
-    #                 continue  # Skip if invalid
-
-    #             extracted_text = self.execute_task('extract_text', [search_result['url']])
-    #             if 'error' not in extracted_text:
-    #                 results.append(extracted_text)
-
-    #         return results
-    #     ```
-
-    #     Write the complete code inside a Python code block.
-    #     """
     ]
 
     def task_descriptions(self):
@@ -431,21 +321,6 @@ class EmpatheticTreeOfThoughtPlanner(BasePlanner):
         # Merge tool instructions with the risk methodology
         risk_context["instructions"] += f"\n\n{tool_instructions}"
 
-        # # Inject risk context into the planner prompt
-        # prompt = (
-        #     self._planner_prompt[0]
-        #     .replace("{input}", query)
-        #     .replace("{meta}", meta)
-        #     .replace(
-        #         "{history}", history if use_history else "No History"
-        #     )
-        #     .replace("{previous_actions}", "\n".join(previous_actions))
-        #     .replace("{tool_names}", self.task_descriptions())
-        #     .replace("{risk_label}", risk_label)
-        #     .replace("{instructions}", risk_context["instructions"])
-        #     .replace("{methodology}", risk_context["methodology"])
-        # )
-
         # Inject risk context into the planner prompt
         prompt = (
             self._planner_prompt[0]
@@ -467,16 +342,6 @@ class EmpatheticTreeOfThoughtPlanner(BasePlanner):
             query=prompt, **kwargs
         )
         print("respp\n\n", response)
-        # prompt = (
-        #     self._planner_prompt[1]
-        #     .replace(
-        #         "{strategy}",
-        #         "Decision:\n" + response.split("Decision:")[-1],
-        #     )
-        #     .replace("{tool_names}", self.get_available_tasks())
-        #     .replace("{previous_actions}", previous_actions_prompt)
-        #     .replace("{input}", query)
-        # )
 
         prompt = (
             self._planner_prompt[1]
